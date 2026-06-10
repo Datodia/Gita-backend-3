@@ -1,0 +1,6 @@
+[
+  { "name": "iphone-13", "price": 2000, "stock": 10 },
+  { "name": "samsung-s20", "price": 1500, "stock": 5 },
+  { "name": "nokia", "price": 200, "stock": 50 },
+  { "name": "xiaomi", "price": 2400, "stock": 100 }
+]
