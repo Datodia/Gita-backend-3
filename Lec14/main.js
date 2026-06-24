@@ -7,8 +7,7 @@ const userRouter2 = require("./users/user2.controller");
 const loggerMiddleware = require("./middlewares/logger.middleware");
 const isAdminMiddleware = require("./middlewares/is-admin.middleware");
 const app = express();
-
-// viewer, editor, admin
+const connectToDb = require('./config/db.config')
 
 app.use(express.json());
 
@@ -26,6 +25,8 @@ app.get("/", (req, res) => {
 });
 
 
-app.listen(4000, () => {
-  console.log("server running on http://localhost:4000");
-});
+connectToDb().then(() => {
+  app.listen(4000, () => {
+    console.log("server running on http://localhost:4000");
+  });
+})

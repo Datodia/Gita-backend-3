@@ -1,84 +1,86 @@
 const { readFile, writeFile } = require("../utils/fs.util");
+const user2Model = require("./user2.model");
 
 
 exports.getAllUsers2 = async (query) => {
-    let users = await readFile("users.json", true);
-    if (query.ageFrom) {
-        users = users.filter((user) => user.age > Number(query.ageFrom));
+    const filter = {}
+    if ('ageFrom' in query) {
+      filter['age'] = {
+        ...filter['age'],
+        '$gte': Number(query.ageFrom)
+      }
     }
 
-    if (query.ageTo) {
-        users = users.filter((user) => user.age < Number(query.ageTo));
+    if ('ageTo' in query) {
+      filter['age'] = {
+        ...filter['age'],
+        '$lte': Number(query.ageTo)
+      }
     }
 
+    if('isSmoker' in query){
+      filter['isSmoker'] = Number(query.isSmoker) ? true : false
+    }
+
+    if('name' in query){
+      filter['name'] = new RegExp(`^${query.name}`)
+    }
+
+    if('email' in query){
+      filter['email'] = new RegExp(`^${query.email}`)
+    }
+
+    const users = await user2Model.find(filter)
     return users
 }
 
 exports.createUser2 = async (body) => {
-  const users = await readFile("users.json", true);
-  const lastId = users[users.length - 1]?.id || 0;
+  const existUser = await user2Model.findOne({email: body.email})
+  if(existUser){
+    return 'USER_EXIST'
+  }
 
-  const newUser = {
-    id: lastId + 1,
+  const newUser = await user2Model.create({
     name: body.name,
+    email: body.email,
     age: body.age,
     isSmoker: body.isSmoker,
-  };
-  users.push(newUser);
-  await writeFile("users.json", users);
+  })
 
   return newUser
 }
 
 
 exports.getUserById2 = async (id) => {
-    const users = await readFile("users.json", true);
-    const index = users.findIndex((user) => user.id === id);
-    if (index === -1) {
+    const user = await user2Model.findById(id)
+    if (!user) {
         return null
     }
 
-    return users[index]
+    return user
 }
 
-exports.deleteUserById2 = async (id, headers) => {
-    const users = await readFile("users.json", true);
-    const index = users.findIndex((user) => user.id === id);
-    if (index === -1) {
-        return null
+exports.deleteUserById2 = async (id) => {
+    const deletedUser = await user2Model.findByIdAndDelete(id)
+
+    if(!deletedUser){
+      return null
     }
 
-    const deletedUser = users.splice(index, 1);
-    await writeFile("users.json", users);
-
-    return deletedUser[0]
+    return deletedUser
 }
 
 
 exports.updateUserById2 = async (id, body) => {
-    const users = await readFile("users.json", true);
-  const index = users.findIndex((user) => user.id === id);
-  if (index === -1) {
+    
+  const updatedUser = await user2Model.findByIdAndUpdate(id, {
+    ...body,
+    $inc: { __v: 1 },
+  }, {new: true})
+
+  if(!updatedUser){
     return null
   }
 
-  const updateReq = {};
-  if (body.name) {
-    updateReq["name"] = body.name;
-  }
-  if (body.age) {
-    updateReq["age"] = body.age;
-  }
-  if (body.hasOwnProperty("isSmoker")) {
-    updateReq["isSmoker"] = body.isSmoker;
-  }
-
-  users[index] = {
-    ...users[index],
-    ...updateReq,
-  };
-
-  await writeFile("users.json", users);
-
-  return users[index]
+  return updatedUser
 }

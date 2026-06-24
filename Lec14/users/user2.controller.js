@@ -2,6 +2,7 @@ const { Router } = require("express");
 const UserService = require("./user2.service");
 const isAdminMiddleware = require("../middlewares/is-admin.middleware");
 const roleMiddleware = require("../middlewares/role.middleware");
+const isValidMongoIdMiddleware = require("../middlewares/is-valid-mongo-id.middleware");
 
 const userRouter2 = new Router();
 
@@ -17,23 +18,25 @@ userRouter2.post("/", roleMiddleware(['editor', 'admin']), async (req, res) => {
     !req.body ||
     !req.body.name ||
     !req.body.age ||
-    !req.body.hasOwnProperty("isSmoker")
+    !req.body.email 
   ) {
     return res
       .status(400)
-      .json({ message: "name age and isSmoker is required" });
+      .json({ message: "name age email is required" });
   }
 
   const newUser = await UserService.createUser2(req.body);
+  if(newUser === 'USER_EXIST'){
+    return res.status(400).json({message: 'user already exsits'})
+  }
 
   res.status(201).json({ success: true, data: newUser });
 });
 
 
 
-userRouter2.get('/:id', roleMiddleware(['viewer','editor', 'admin']), async (req, res) => {
-    const id = Number(req.params.id);
-    const user = await UserService.getUserById2(id)
+userRouter2.get('/:id', isValidMongoIdMiddleware, roleMiddleware(['viewer','editor', 'admin']), async (req, res) => {
+    const user = await UserService.getUserById2(req.params.id)
     if(!user){
         return res.status(404).json({message: "user not found"})
     }
@@ -41,24 +44,18 @@ userRouter2.get('/:id', roleMiddleware(['viewer','editor', 'admin']), async (req
 })
 
 
-userRouter2.delete('/:id', roleMiddleware([ 'admin']), async (req, res) => {
-    const id = Number(req.params.id);
-    const deletedUser = await UserService.deleteUserById2(id, req.headers)
+userRouter2.delete('/:id', isValidMongoIdMiddleware, roleMiddleware([ 'admin']), async (req, res) => {
+    const deletedUser = await UserService.deleteUserById2(req.params.id)
     if(!deletedUser){
         return res.status(404).json({message: "user not found"})
-    }
-
-    if(deletedUser === 'PERMITION_DENIED'){
-        return res.status(403).json({message: "only admin can do"})
     }
 
     res.json({ success: true, data: deletedUser });
 })
 
 
-userRouter2.put('/:id', roleMiddleware(['editor', 'admin']), async (req, res) => {
-    const id = Number(req.params.id);
-    const updatedUser = await UserService.updateUserById2(id, req.body)
+userRouter2.put('/:id', isValidMongoIdMiddleware, roleMiddleware(['editor', 'admin']), async (req, res) => {
+    const updatedUser = await UserService.updateUserById2(req.params.id, req.body)
     if(!updatedUser){
         return res.status(404).json({message: "user not found"})
     }
