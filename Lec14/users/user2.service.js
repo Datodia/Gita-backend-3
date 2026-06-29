@@ -30,26 +30,9 @@ exports.getAllUsers2 = async (query) => {
       filter['email'] = new RegExp(`^${query.email}`)
     }
 
-    const users = await user2Model.find(filter)
+    const users = await user2Model.find(filter).populate('posts', 'title desc')
     return users
 }
-
-exports.createUser2 = async (body) => {
-  const existUser = await user2Model.findOne({email: body.email})
-  if(existUser){
-    return 'USER_EXIST'
-  }
-
-  const newUser = await user2Model.create({
-    name: body.name,
-    email: body.email,
-    age: body.age,
-    isSmoker: body.isSmoker,
-  })
-
-  return newUser
-}
-
 
 exports.getUserById2 = async (id) => {
     const user = await user2Model.findById(id)

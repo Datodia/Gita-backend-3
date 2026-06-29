@@ -6,34 +6,12 @@ const isValidMongoIdMiddleware = require("../middlewares/is-valid-mongo-id.middl
 
 const userRouter2 = new Router();
 
-userRouter2.get("/", roleMiddleware(['viewer', 'editor', 'admin']) ,async (req, res) => {
+userRouter2.get("/" ,async (req, res) => {
   const ip = req.ip;
   console.log(ip, "ip");
   let users = await UserService.getAllUsers2(req.query);
   res.json(users);
 });
-
-userRouter2.post("/", roleMiddleware(['editor', 'admin']), async (req, res) => {
-  if (
-    !req.body ||
-    !req.body.name ||
-    !req.body.age ||
-    !req.body.email 
-  ) {
-    return res
-      .status(400)
-      .json({ message: "name age email is required" });
-  }
-
-  const newUser = await UserService.createUser2(req.body);
-  if(newUser === 'USER_EXIST'){
-    return res.status(400).json({message: 'user already exsits'})
-  }
-
-  res.status(201).json({ success: true, data: newUser });
-});
-
-
 
 userRouter2.get('/:id', isValidMongoIdMiddleware, roleMiddleware(['viewer','editor', 'admin']), async (req, res) => {
     const user = await UserService.getUserById2(req.params.id)

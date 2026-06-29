@@ -7,7 +7,9 @@ const userRouter2 = require("./users/user2.controller");
 const loggerMiddleware = require("./middlewares/logger.middleware");
 const isAdminMiddleware = require("./middlewares/is-admin.middleware");
 const app = express();
-const connectToDb = require('./config/db.config')
+const connectToDb = require('./config/db.config');
+const authRouter = require("./auth/auth.controller");
+const postRouter = require("./posts/post.controller");
 
 app.use(express.json());
 
@@ -19,6 +21,8 @@ app.use(loggerMiddleware)
 app.use('/users', userRouter2)
 app.use('/chess', chessRouter)
 app.use('/secret', secretRouter)
+app.use('/auth', authRouter)
+app.use('/posts', postRouter)
 
 app.get("/", (req, res) => {
   res.send('<h1 style="color: red;">hello world</h1>');

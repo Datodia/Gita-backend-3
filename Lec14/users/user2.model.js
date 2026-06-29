@@ -19,7 +19,17 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         required: true
-    }
+    },
+    password: {
+        type: String,
+        required: true,
+        select: false
+    },
+    posts: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'post',
+        default: []
+    }]
 }, {timestamps: true})
 
 module.exports = mongoose.model('user', userSchema)
