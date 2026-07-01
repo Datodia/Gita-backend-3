@@ -4,12 +4,13 @@ const { createPostDto } = require("./dto/create-post.dto");
 const isAuthMiddleware = require("../middlewares/is-auth.middleware");
 const PostService = require('./post.service');
 const isValidMongoIdMiddleware = require("../middlewares/is-valid-mongo-id.middleware");
+const upload = require("../middlewares/upload.middleware");
 
 const postRouter = new Router()
 
-postRouter.post('/', isAuthMiddleware, validate(createPostDto), async (req, res)=>{
+postRouter.post('/', isAuthMiddleware, upload.single('postImage'), validate(createPostDto), async (req, res)=>{
     const {title, desc} = req.body
-    const newPost = await PostService.createPost({title, desc, author: req.userId})
+    const newPost = await PostService.createPost({title, desc, author: req.userId, file: req.file})
 
     res.status(201).json({message: "post created successfully"})
 })
