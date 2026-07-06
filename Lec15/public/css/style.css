@@ -1,0 +1,26 @@
+.title{
+    color: red;
+}
+
+.userCard{
+    width: 200px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid black;
+}
+
+ul{
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+}
+
+li{
+    list-style-type: none;
+}
+
+li a{
+    color: black;
+    font-weight: 800;
+    text-decoration: none;
+}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header.ejs') %>
+    <h1>Create user</h1>
+    <a href="/">Back to home</a>
+    
+    <form action="/api/users" method="post">
+        <input required placeholder="enter name" type="text" name="name">
+        <input required placeholder="enter age" type="number" name="age">
+
+        <button type="submit">Create</button>
+    </form>
+
+</body>
+</html>

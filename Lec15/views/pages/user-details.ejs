@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= user?.name ?? 'User'%> Detail</title>
+</head>
+<body>
+    <a href="/">Back to home</a>
+
+
+    <% if(!user) {%>
+        <h1>User not found</h1>
+    <% } else { %>
+    
+        <h1>Details</h1>
+
+        <h1>ID: <%= user?.id %></h1>
+        <h1>Name: <%= user?.name %></h1>
+        <h1>Age: <%= user?.age %></h1>
+   
+    <% }  %>
+    
+
+</body>
+</html>
