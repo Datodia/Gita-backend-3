@@ -15,9 +15,9 @@ function sum({ a, b, isPositive, isNegative }) {
 console.log(sum({ a: 20, b: 40, isNegative: true }));
 console.log(sum({ a: 10, b: -40, isPositive: true }));
 // void functions
-function doSomething() {
-    console.log('did something');
-}
+// function doSomething(){
+//     console.log('did something')
+// }
 const numbers = [1, 2, 3, false, 'string'];
 const strings = ['a', 'b', 'c'];
 function log(msg) {
@@ -33,18 +33,19 @@ const student = {
         work: "test2"
     }
 };
-function drawButton(variant) {
-    const options = {
-        'MD': "16px",
-        "SM": "12px",
-        'LG': "20px"
-    };
-    return options[variant];
-}
-drawButton('LG');
-function getUserInfo(student) {
-    return student.name;
-}
+// type BtnVariant = 'SM' | 'MD' | 'LG'
+// function drawButton(variant: BtnVariant){
+//     const options = {
+//         'MD': "16px",
+//         "SM": "12px",
+//         'LG': "20px"
+//     }
+//     return options[variant]
+// }
+// drawButton('LG')
+// function getUserInfo(student:IStudent){
+//     return student.name
+// }
 // getUserInfo({})
 function getErrorMessage(err) {
     if (!err)
@@ -106,11 +107,86 @@ async function main() {
     const response = await getUserData();
     response.name;
 }
-function getFirstItem(arr) {
-    return arr[0];
+const coordinates = [41.123123, 42.123123];
+function useState(initVal) {
+    let val = initVal;
+    function setState(num) {
+        val = num;
+    }
+    return [val, setState];
 }
-getFirstItem([1, 2, 3]); // => 1
-getFirstItem(['test', 'test12', 'test3']); // => test
-getFirstItem([false, true, false]); // => test
-getFirstItem([{ a: 'b' }]); // => test
+const [count, setCount] = useState(0);
+function getUserInfo(str) {
+    if (!str && !str.length)
+        return null;
+    const [name, age] = str.split(', ');
+    return [name, Number(age)];
+}
+// getUserInfo('giorgi, 25') //=> [name, userAge]
+// getUserInfo('marika, 26') //=> [name, userAge]
+const Role1 = {
+    VIEWER: 'viwer',
+    EDITOR: 'editor',
+    ADMIN: 'admin'
+};
+// Role1['VIEWER'] = 'admin'
+var Role;
+(function (Role) {
+    Role["VIEWER"] = "viwer";
+    Role["EDITOR"] = "editor";
+    Role["ADMIN"] = "admin";
+    Role["SUPER_ADMIN"] = "super admin";
+})(Role || (Role = {}));
+var StatusCode;
+(function (StatusCode) {
+    StatusCode[StatusCode["SUCCESS"] = 200] = "SUCCESS";
+    StatusCode[StatusCode["CREATED"] = 201] = "CREATED";
+    StatusCode[StatusCode["BAD_REQUEST"] = 400] = "BAD_REQUEST";
+    StatusCode[StatusCode["NOT_FOUND"] = 404] = "NOT_FOUND";
+    StatusCode[StatusCode["INTERNAL_SERVER_ERROR"] = 500] = "INTERNAL_SERVER_ERROR";
+})(StatusCode || (StatusCode = {}));
+var Reason;
+(function (Reason) {
+    Reason["IN_PROGRESS"] = "";
+})(Reason || (Reason = {}));
+// res.status(StatusCode.BAD_REQUEST).json()
+// Role['ADMIN'] = 'VIWER'
+// if(req.header.role === 'admin')
+// if(req.header.role === Role.)
+// console.log(Role1.VIEWER, "viewer")
+function getSomething(val) {
+    if (typeof val === 'string') {
+        val.includes('');
+    }
+    if (typeof val === 'number') {
+        val.toFixed();
+    }
+    if (typeof val === 'object' && Array.isArray(val)) {
+        val;
+    }
+}
+const btnObj = {
+    'sm': "24px",
+    'md': '30px',
+    'lg': '36px',
+    // 'xs': '20px'
+};
+const university1 = {
+    phoneNumber: 123123123,
+    address: 'asd',
+    email: 'asdas',
+    name: 'asdasd'
+};
+function getRole(role) {
+    switch (role) {
+        case Role.ADMIN:
+            return 'ADMiN';
+        case Role.EDITOR:
+            return 'EDITOR';
+        case Role.VIEWER:
+            return 'Viewer';
+        default:
+        // let unreachable: never = role
+    }
+}
 //# sourceMappingURL=index.js.map
