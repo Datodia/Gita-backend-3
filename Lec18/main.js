@@ -17,16 +17,21 @@ const io = new Server(server, {
 app.use(cors({ origin: '*' }))
 app.use(express.json())
 
+// shared group room id (same value on client + server)
+const GROUP_ID = 'group:general'
+
 // connect to MongoDB
 mongoose
     .connect(process.env.MONGO_URL)
     .then(() => console.log('mongo connected'))
     .catch((err) => console.error('mongo connection error', err))
 
-// one document per private message
+// one document per message — DMs use `to`, group messages use `room`
 const messageSchema = new mongoose.Schema({
     from: { type: String, required: true }, // sender email
-    to: { type: String, required: true }, // recipient email
+    fromName: { type: String }, // sender display name (group)
+    to: { type: String }, // recipient email (DM only)
+    room: { type: String }, // group room id (group only)
     text: { type: String, required: true },
     ts: { type: Number, required: true }, // client-visible timestamp
 })
@@ -50,23 +55,28 @@ io.on('connection', (socket) => {
 
         // personal room so we can DM by email even if modal not open yet
         socket.join(email)
+        // everyone shares one group room
+        socket.join(GROUP_ID)
 
         io.emit('online:users', onlineUsers)
     })
 
-    // Client asks for the saved conversation with one peer
-    socket.on('history:load', async ({ user, peer }) => {
+    // Client asks for a saved conversation: a DM (user + peer) or the group (room)
+    socket.on('history:load', async ({ user, peer, room }) => {
         try {
-            const messages = await Message.find({
-                $or: [
-                    { from: user, to: peer },
-                    { from: peer, to: user },
-                ],
-            })
-                .sort({ ts: 1 })
-                .lean()
+            const query = room
+                ? { room }
+                : {
+                      $or: [
+                          { from: user, to: peer },
+                          { from: peer, to: user },
+                      ],
+                  }
 
-            socket.emit('history:load', { peer, messages })
+            const messages = await Message.find(query).sort({ ts: 1 }).lean()
+
+            // `chat` is the client-side conversation key (peer email or room id)
+            socket.emit('history:load', { chat: room || peer, messages })
         } catch (err) {
             console.error('history load error', err)
         }
@@ -84,6 +94,19 @@ io.on('connection', (socket) => {
         }
 
         io.to(to).to(from).emit('message:private', message)
+    })
+
+    // Group message, delivered to everyone in the shared room
+    socket.on('message:group', async ({ from, fromName, text }) => {
+        const message = { from, fromName, room: GROUP_ID, text, ts: Date.now() }
+
+        try {
+            await Message.create(message)
+        } catch (err) {
+            console.error('group message save error', err)
+        }
+
+        io.to(GROUP_ID).emit('message:group', message)
     })
 
     socket.on('disconnect', () => {

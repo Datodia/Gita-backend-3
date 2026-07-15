@@ -2,10 +2,10 @@
 
 import { useChat } from "@/app/ChatProvider";
 import OnlineSidebar from "./OnlineSidebar";
-import DMModal from "./DMModal";
+import ChatPanel from "./ChatPanel";
 
 export default function Chat() {
-  const { me, logout, onlineUsers } = useChat();
+  const { me, logout, onlineUsers, activeChat } = useChat();
   if (!me) return null;
 
   const otherCount = Object.keys(onlineUsers).filter(
@@ -33,25 +33,29 @@ export default function Chat() {
 
       {/* body: main area + online sidebar */}
       <div className="flex flex-1 overflow-hidden">
-        <main className="flex flex-1 items-center justify-center p-8">
-          <div className="max-w-md text-center">
-            <div className="mb-4 text-5xl">💬</div>
-            <h2 className="mb-2 text-xl font-semibold">
-              {otherCount > 0
-                ? "Pick someone to chat with"
-                : "Waiting for others..."}
-            </h2>
-            <p className="text-sm text-neutral-400">
-              Online users appear in the right sidebar. Click any of them to
-              open a direct-message window.
-            </p>
-          </div>
+        <main className="flex flex-1 overflow-hidden">
+          {activeChat ? (
+            <ChatPanel />
+          ) : (
+            <div className="flex flex-1 items-center justify-center p-8">
+              <div className="max-w-md text-center">
+                <div className="mb-4 text-5xl">💬</div>
+                <h2 className="mb-2 text-xl font-semibold">
+                  {otherCount > 0
+                    ? "Pick someone to chat with"
+                    : "Waiting for others..."}
+                </h2>
+                <p className="text-sm text-neutral-400">
+                  Open the group chat or pick an online user from the right
+                  sidebar. Messages open right here.
+                </p>
+              </div>
+            </div>
+          )}
         </main>
 
         <OnlineSidebar />
       </div>
-
-      <DMModal />
     </div>
   );
 }
