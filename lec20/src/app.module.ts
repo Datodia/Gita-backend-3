@@ -4,9 +4,18 @@ import { AppService } from './app.service';
 import { ExpensesModule } from './expenses/expenses.module';
 import { UsersModule } from './users/users.module';
 import { UserAgentMiddleware } from './middlewares/user-agent.middleware';
+import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-  imports: [ExpensesModule, UsersModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
+    MongooseModule.forRoot(process.env.MONGO_URI!),
+    ExpensesModule,
+    UsersModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

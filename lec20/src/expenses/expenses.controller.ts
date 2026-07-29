@@ -5,6 +5,7 @@ import { ExpenseQueryPipe } from './pipes/expense-query.pipe';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { type Request } from 'express';
+import { IsValidObjectId } from 'src/common/dto/is-valid-object-id.dto';
 
 // http://localhost:3000/expenses
 @Controller('expenses')
@@ -23,7 +24,7 @@ export class ExpensesController {
     }
 
     @Get(':id')
-    getById(@Param('id', ParseIntPipe) id){
+    getById(@Param() {id}: IsValidObjectId){
         return this.expensesService.getById(id)
     }
 
@@ -32,9 +33,7 @@ export class ExpensesController {
     create(
         // @Body(new CreateExpensePipe()) body
         @Body() createExpenseDto: CreateExpenseDto,
-        @Req() req: Request
     ){
-        console.log(req['email'])
         return this.expensesService.create(createExpenseDto)
     }
 }
