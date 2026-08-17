@@ -1,5 +1,4 @@
-import {IsIn, IsMongoId, IsNotEmpty, IsNumber, IsString, Min} from 'class-validator'
-import mongoose from 'mongoose'
+import {IsIn, IsNotEmpty, IsNumber, IsString, Min} from 'class-validator'
 
 
 export class CreateExpenseDto {
@@ -12,8 +11,4 @@ export class CreateExpenseDto {
     @IsNumber()
     @Min(1)
     amount!: number
-
-
-    @IsMongoId()
-    owner!: mongoose.Schema.Types.ObjectId
 }

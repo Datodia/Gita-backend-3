@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,6 +6,8 @@ import { SafeGuard } from 'src/guards/safe.guard';
 import { AccessGuard, Admin, Editor, Viewer } from 'src/guards/role.guard';
 import mongoose, { isValidObjectId } from 'mongoose';
 import { IsValidObjectId } from 'src/common/dto/is-valid-object-id.dto';
+import { IsAuthGuard } from 'src/guards/isAuth.guard';
+import { UserId } from './decorators/user.decorator';
 
 
 // @UseGuards(SafeGuard)
@@ -13,12 +15,12 @@ import { IsValidObjectId } from 'src/common/dto/is-valid-object-id.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  // @UseGuards(new AccessGuard('admin', 'editor'))
-  // @UseGuards(SafeGuard)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
+  // @Post()
+  // // @UseGuards(new AccessGuard('admin', 'editor'))
+  // // @UseGuards(SafeGuard)
+  // create(@Body() createUserDto: CreateUserDto) {
+  //   return this.usersService.create(createUserDto);
+  // }
 
   @Get()
   // @UseGuards(Viewer)
@@ -34,14 +36,19 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(IsAuthGuard)
   // @UseGuards(new AccessGuard('admin', 'editor'))
   update(@Param() {id}: IsValidObjectId, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
+  @UseGuards(IsAuthGuard)
   // @UseGuards(new AccessGuard('admin'))
-  remove(@Param() {id}: IsValidObjectId) {
+  remove(@Param() {id}: IsValidObjectId, @UserId() userId) {
+    if(userId !== id){
+      throw new UnauthorizedException('permition deneid')
+    }
     return this.usersService.remove(id);
   }
 }

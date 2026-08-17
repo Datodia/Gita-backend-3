@@ -24,7 +24,7 @@ export class ExpensesService {
         return this.expenseModel.findById(id).populate({path: 'owner', select: 'fullName age -_id'})
     }
 
-    async create({category, amount, owner}: CreateExpenseDto){
+    async create({category, amount, owner}: CreateExpenseDto & {owner: mongoose.Schema.Types.ObjectId}){
        const newExpense = await this.expenseModel.create({
         amount,
         category,

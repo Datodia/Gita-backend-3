@@ -4,17 +4,32 @@ import { AppService } from './app.service';
 import { ExpensesModule } from './expenses/expenses.module';
 import { UsersModule } from './users/users.module';
 import { UserAgentMiddleware } from './middlewares/user-agent.middleware';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
     }),
+    // JwtModule.registerAsync({
+    //   global: true,
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     secret: configService.get('JWT_SECRET')
+    //   }),
+    //   inject: [ConfigService]
+    // }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET
+    }),
     MongooseModule.forRoot(process.env.MONGO_URI!),
     ExpensesModule,
-    UsersModule
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
