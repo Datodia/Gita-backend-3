@@ -21,9 +21,10 @@ export class ExpensesController {
         // @Query('category') category,
         // @Query('priceFrom') priceFrom,
         // @Query(new ExpenseQueryPipe) query
-        @Query() paginationDto: PaginationDto
+        @Query() paginationDto: PaginationDto,
+        @UserId() userId
     ){
-        return this.expensesService.getAll(paginationDto)
+        return this.expensesService.getAll(paginationDto, userId)
     }
 
     @Get(':id')

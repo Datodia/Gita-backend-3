@@ -15,8 +15,8 @@ export class ExpensesService {
         private userService: UsersService
     ){}
 
-    getAll({page, take}: PaginationDto){
-        return this.expenseModel.find()
+    getAll({page, take}: PaginationDto, userId){
+        return this.expenseModel.find({owner: userId}).populate({path: 'owner', select: 'fullName age email -_id'})
     }
 
 
