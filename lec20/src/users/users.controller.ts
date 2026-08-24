@@ -15,12 +15,12 @@ import { UserId } from './decorators/user.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // @Post()
-  // // @UseGuards(new AccessGuard('admin', 'editor'))
-  // // @UseGuards(SafeGuard)
-  // create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.create(createUserDto);
-  // }
+  @Post()
+  // @UseGuards(new AccessGuard('admin', 'editor'))
+  // @UseGuards(SafeGuard)
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
 
   @Get()
   // @UseGuards(Viewer)
@@ -36,7 +36,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseGuards(IsAuthGuard)
+  // @UseGuards(IsAuthGuard)
   // @UseGuards(new AccessGuard('admin', 'editor'))
   update(@Param() {id}: IsValidObjectId, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);

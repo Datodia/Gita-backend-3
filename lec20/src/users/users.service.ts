@@ -13,7 +13,7 @@ export class UsersService {
     @InjectModel('expense') private expenseModel: Model<Expense>,
   ){}
 
-  async create({age, email, fullName}: CreateUserDto) {
+  async create({age, email, fullName, address}: CreateUserDto) {
     const existUser = await this.userModel.findOne({email})
     if(existUser){
       throw new BadRequestException('User alredy exists')
@@ -22,7 +22,9 @@ export class UsersService {
     const newUser = await this.userModel.create({
       age,
       email,
-      fullName
+      fullName,
+      password: "test123",
+      address
     })
     return newUser
   }
@@ -37,19 +39,18 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const udpatedUser = await this.userModel.findByIdAndUpdate(
-      id, 
-      {
-        ...updateUserDto,
-        $inc: {__v:1}
-      },
-      {new: true}
-    )
+    const user = await this.userModel.findById(id)
+    if(!user) throw new NotFoundException('User not found')
 
-    if(!udpatedUser){
-      throw new NotFoundException('user not found')
+    if(updateUserDto.fullName) user.fullName = updateUserDto.fullName
+    if(updateUserDto.email) user.email = updateUserDto.email
+    if(updateUserDto.age) user.age = updateUserDto.age
+
+    if(updateUserDto.address){
+      Object.assign(user.address, updateUserDto.address)
     }
-    return udpatedUser
+
+    return user.save()
   }
 
   async addExpenseToUser(userId: mongoose.Schema.Types.ObjectId, expenseId:string){
