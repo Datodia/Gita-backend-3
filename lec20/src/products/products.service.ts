@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { faker } from '@faker-js/faker';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { QueryParamsDto } from './dto/query-params.dto';
 
 @Injectable()
 export class ProductsService {
@@ -16,6 +17,30 @@ export class ProductsService {
 
   async onModuleInit(){
     const productCount = await this.productModel.countDocuments()
+
+    // await this.productModel.updateMany(
+    //   {price: 450}, 
+    //   {
+    //     $set: {
+    //       price: 550
+    //     }
+    //   }
+    // )
+
+
+    // await this.productModel.updateMany(
+    //   {},
+    //   {
+    //     $set: {
+    //       desc: faker.commerce.productDescription(),
+    //     },
+    //     '$inc': {
+    //       __v: 1
+    //     }
+    //   }
+    // )
+
+
     if(productCount === 0){
       const dataToInsert: any[] = []
       console.log('seeding starting')
@@ -42,14 +67,96 @@ export class ProductsService {
     return 'This action adds a new product';
   }
 
-  async findAll() {
-    const val = await this.cacheManager.get('products');
-    if(!val){
-      const resp = await this.productModel.find({stock: 50})
-      await this.cacheManager.set('products', resp, 5 * 60 * 1000)
-      return resp
+  async findAll({page = 1, take = 30, priceFrom, priceTo,name, isStock, sort, includeName}:QueryParamsDto) {
+    // const val = await this.cacheManager.get('products');
+    // if(!val){
+    //   const resp = await this.productModel.find({stock: 50})
+    //   await this.cacheManager.set('products', resp, 5 * 60 * 1000)
+    //   return resp
+    // }
+    // return val
+
+    const filter: any = {}
+    const sortQuery: any = {}
+    const projection: any = {}
+
+    if(includeName && includeName === 1){
+      projection['name'] = 1
     }
-    return val
+    if(includeName === 0){
+      projection['name'] = 0
+    }
+
+
+    if(priceFrom){
+      filter['price'] = {...filter.price, $gte: priceFrom}
+    }
+
+    if(priceTo){
+      filter['price'] = {...filter.price, $lte: priceTo}
+    }
+
+    if(name){
+      filter['name'] = {'$regex': name, '$options': 'i'}
+    }
+
+    if(isStock && isStock === 1){
+      filter['stock'] = {$ne: 0}
+    }
+
+    if(isStock === 0){
+      filter['stock'] = 0
+    }
+
+    if(sort && sort === 'price'){
+      sortQuery['price'] = 1
+    }
+    if(sort && sort === '-price'){
+      sortQuery['price'] = -1
+    }
+
+    if(sort && sort === '-date'){
+      sortQuery['_id'] = -1
+    }
+
+    if(sort && sort === 'date'){
+      sortQuery['_id'] = 1
+    }
+
+
+    // const resp = await this.productModel
+    //                           .find(filter, projection)
+    //                           .sort(sortQuery)
+    //                           .skip((page - 1) * take)
+    //                           .limit(take)
+
+    const resp = await this.productModel.aggregate([
+      // {$match: {price: {'$gte': 100}}},
+      {$group: {_id: '$name', 
+        totalProducts: {
+        $sum: 1
+      },
+
+      averagePrice: {
+        $avg: "$price"
+      },
+
+        totalStock: {
+          $sum: "$stock"
+        },
+        cheapest: {
+          $min: "$price"
+        },
+
+        mostExpensive: {
+          $max: "$price"
+        }
+      }},
+      {$sort: {averagePrice: 1}},
+      {$limit: 50},
+    ])
+
+    return resp
   }
 
 

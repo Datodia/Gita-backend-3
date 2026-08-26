@@ -1,4 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Role } from "src/common/enums/role.enum";
+
 
 @Schema()
 export class Product {
@@ -38,6 +40,20 @@ export class Product {
     })
     rating!: number
 
+
+    @Prop({
+        enum: Role,
+        required: true,
+        default: Role.USER
+    })
+    role!: string
+
+
+    @Prop({
+        type: String,
+        required: false
+    })
+    desc?: string 
 }
 
 
