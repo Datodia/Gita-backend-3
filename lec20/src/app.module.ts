@@ -17,6 +17,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'pino-nestjs';
 import { ProductsModule } from './products/products.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { TestService } from './test/test.service';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     ProductsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TestService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { faker } from '@faker-js/faker';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -12,7 +12,7 @@ import { QueryParamsDto } from './dto/query-params.dto';
 export class ProductsService {
   constructor(
     @InjectModel('product') private productModel: Model<Product>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    // @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ){}
 
   async onModuleInit(){
@@ -64,7 +64,7 @@ export class ProductsService {
   // }
 
   create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+    return this.productModel.create(createProductDto);
   }
 
   async findAll({page = 1, take = 30, priceFrom, priceTo,name, isStock, sort, includeName}:QueryParamsDto) {
@@ -160,8 +160,17 @@ export class ProductsService {
   }
 
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string) {
+    if(!isValidObjectId(id)){
+      throw new BadRequestException('Wrong Id provided')
+    }
+
+    const product = await this.productModel.findById(id)
+    if(!product){
+      throw new NotFoundException('Product not found')
+    }
+
+    return product
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
