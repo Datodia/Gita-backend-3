@@ -7,11 +7,15 @@ import { Product } from './schema/product.schema';
 import { faker } from '@faker-js/faker';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { QueryParamsDto } from './dto/query-params.dto';
+import { AwsS3Service } from 'src/aws-s3/aws-s3.service';
+import { randomUUID } from 'crypto';
+import path from 'path';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel('product') private productModel: Model<Product>,
+    private awsS3Service: AwsS3Service
     // @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ){}
 
@@ -63,8 +67,33 @@ export class ProductsService {
   //   console.log('module destroy')
   // }
 
-  create(createProductDto: CreateProductDto) {
-    return this.productModel.create(createProductDto);
+  async uploadImage(file: Express.Multer.File){
+    const ext = path.extname(file.originalname)
+    const fileId = `images/${randomUUID()}${ext}`
+
+    return await this.awsS3Service.uploadFile(fileId, file.buffer, file.mimetype)
+  }
+
+  async uploadMany(files: Express.Multer.File[]){
+    const uploadedImage:string[] = []
+    for(let file of files){
+      const fileId = await this.uploadImage(file)
+      uploadedImage.push(fileId)
+    }
+    return uploadedImage
+  }
+
+  getFile(fileId: string){
+    return this.awsS3Service.getFile(fileId)
+  }
+
+  async create(createProductDto: CreateProductDto, file: Express.Multer.File) {
+    const ext = path.extname(file.originalname)
+    const fileId = `images/${randomUUID()}${ext}`
+
+    await this.awsS3Service.uploadFile(fileId, file.buffer, file.mimetype)
+
+    return this.productModel.create({...createProductDto, photoUrl: fileId});
   }
 
   async findAll({page = 1, take = 30, priceFrom, priceTo,name, isStock, sort, includeName}:QueryParamsDto) {
@@ -177,7 +206,11 @@ export class ProductsService {
     return `This action updates a #${id} product`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    const product = await this.productModel.findById(id)
+    if(!product) throw new NotFoundException('prodict not found')
+
+    await this.awsS3Service.deleteFile(product.photoUrl)
+    return await this.productModel.findByIdAndDelete(id)
   }
 }
