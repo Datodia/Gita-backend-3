@@ -153,37 +153,37 @@ export class ProductsService {
     }
 
 
-    // const resp = await this.productModel
-    //                           .find(filter, projection)
-    //                           .sort(sortQuery)
-    //                           .skip((page - 1) * take)
-    //                           .limit(take)
+    const resp = await this.productModel
+                              .find(filter, projection)
+                              .sort(sortQuery)
+                              .skip((page - 1) * take)
+                              .limit(take)
 
-    const resp = await this.productModel.aggregate([
-      // {$match: {price: {'$gte': 100}}},
-      {$group: {_id: '$name', 
-        totalProducts: {
-        $sum: 1
-      },
+    // const resp = await this.productModel.aggregate([
+    //   // {$match: {price: {'$gte': 100}}},
+    //   {$group: {_id: '$name', 
+    //     totalProducts: {
+    //     $sum: 1
+    //   },
 
-      averagePrice: {
-        $avg: "$price"
-      },
+    //   averagePrice: {
+    //     $avg: "$price"
+    //   },
 
-        totalStock: {
-          $sum: "$stock"
-        },
-        cheapest: {
-          $min: "$price"
-        },
+    //     totalStock: {
+    //       $sum: "$stock"
+    //     },
+    //     cheapest: {
+    //       $min: "$price"
+    //     },
 
-        mostExpensive: {
-          $max: "$price"
-        }
-      }},
-      {$sort: {averagePrice: 1}},
-      {$limit: 50},
-    ])
+    //     mostExpensive: {
+    //       $max: "$price"
+    //     }
+    //   }},
+    //   {$sort: {averagePrice: 1}},
+    //   {$limit: 50},
+    // ])
 
     return resp
   }

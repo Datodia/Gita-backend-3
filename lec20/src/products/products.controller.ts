@@ -16,6 +16,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import {ApiQuery, ApiResponse} from '@nestjs/swagger'
 
 @Controller('products')
 export class ProductsController {
@@ -31,6 +32,21 @@ export class ProductsController {
   }
 
   @Get()
+  @ApiResponse({status: 200, example: [{
+    "_id": "6a8c6a6183192d78e0733df1",
+    "role": "user",
+    "name": "Gloves",
+    "price": 422.25,
+    "photoUrl": "https://avatars.githubusercontent.com/u/81115190",
+    "stock": 90,
+    "rating": 8,
+    "__v": 1,
+    "desc": "Discover the turtle-like agility of our Bike, perfect for juvenile users"
+  }]})
+  @ApiQuery({name: 'page', example: 1, type: Number, required: false, default: 1})
+  @ApiQuery({name: 'take', example: 30, type: Number, required: false, default: 30})
+  @ApiQuery({name: 'priceFrom', type: Number, required: false })
+  @ApiQuery({name: 'priceTo', type: Number, required: false})
   findAll(@Query() queryParams: QueryParamsDto) {
     return this.productsService.findAll(queryParams);
   }

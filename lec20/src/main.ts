@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { loggerMiddleware } from './middlewares/logger.middleware';
 import { SafeGuard } from './guards/safe.guard';
 import { Logger } from 'pino-nestjs';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {bufferLogs: true});
@@ -20,6 +21,17 @@ async function bootstrap() {
     transform: true,
     validateCustomDecorators: true
   }))
+
+
+  const config = new DocumentBuilder()
+    .setTitle('Gita Backend 3 course')
+    .setDescription('Random description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, documentFactory);
 
   // app.use(loggerMiddleware)
   // this is global guard
