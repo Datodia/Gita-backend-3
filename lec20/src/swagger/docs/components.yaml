@@ -1,0 +1,320 @@
+components:
+  parameters:
+    ObjectIdParam:
+      name: id
+      in: path
+      required: true
+      description: Mongo ObjectId
+      schema:
+        type: string
+        pattern: '^[0-9a-fA-F]{24}$'
+        example: 6aa17703a1daf718c6965010
+
+  schemas:
+    HttpError:
+      type: object
+      properties:
+        message:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        error:
+          type: string
+        statusCode:
+          type: integer
+      example:
+        message: Bad Request
+        error: Bad Request
+        statusCode: 400
+
+    SignUpDto:
+      type: object
+      required: [fullName, email, age, password]
+      properties:
+        fullName:
+          type: string
+          example: Giorgi Giorgadze
+        email:
+          type: string
+          format: email
+          example: giorgi@gmail.com
+        age:
+          type: number
+          example: 22
+        password:
+          type: string
+          minLength: 6
+          maxLength: 20
+          example: Test@123
+
+    SignInDto:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: giorgi@gmail.com
+        password:
+          type: string
+          example: Test@123
+
+    TokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      example:
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWExNzcwM2ExZGFmNzE4YzY5NjUwMTAiLCJpYXQiOjE3ODg5NjY5MjQsImV4cCI6MTc4ODk3MDUyNH0.bXFw16Tjbe1O51UNJiQap5TpXEW7p_rGxlx6KFPjJ_g
+
+    SuccessMessage:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      example:
+        success: true
+        message: user created successfully
+
+    Address:
+      type: object
+      required: [street, city]
+      properties:
+        street:
+          type: string
+          example: Chavchavadze ave. 1
+        city:
+          type: string
+          example: Tbilisi
+
+    CreateUserDto:
+      type: object
+      required: [fullName, email, age]
+      properties:
+        fullName:
+          type: string
+          example: Giorgi Giorgadze
+        email:
+          type: string
+          format: email
+          example: giorgi@gmail.com
+        age:
+          type: number
+          example: 22
+        address:
+          $ref: '#/components/schemas/Address'
+
+    UpdateUserDto:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: Giorgi Giorgadze
+        email:
+          type: string
+          format: email
+          example: giorgi@gmail.com
+        age:
+          type: number
+          example: 23
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+            city:
+              type: string
+
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        age:
+          type: number
+        expenses:
+          type: array
+          items:
+            type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        __v:
+          type: integer
+      example:
+        _id: 6aa17703a1daf718c6965010
+        fullName: giorgi giorgadze
+        email: giorgi@gmail.com
+        age: 22
+        expenses: []
+        createdAt: '2026-09-09T15:10:59.047Z'
+        updatedAt: '2026-09-09T15:10:59.047Z'
+        __v: 0
+
+    CreateProductMultipart:
+      type: object
+      required: [name, price, stock, rating]
+      properties:
+        name:
+          type: string
+          example: Gloves
+        price:
+          type: number
+          example: 422.25
+        stock:
+          type: number
+          example: 90
+        rating:
+          type: number
+          example: 8
+        role:
+          type: string
+          enum: [user, student, admin]
+          default: user
+        desc:
+          type: string
+          example: Warm winter gloves
+        photo:
+          type: string
+          format: binary
+          description: Product image, uploaded to S3
+
+    UpdateProductDto:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        stock:
+          type: number
+        rating:
+          type: number
+        role:
+          type: string
+          enum: [user, student, admin]
+        desc:
+          type: string
+
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        photoUrl:
+          type: string
+        stock:
+          type: number
+        rating:
+          type: number
+        role:
+          type: string
+        desc:
+          type: string
+        __v:
+          type: integer
+      example:
+        _id: 6a8c6a6183192d78e0733df1
+        role: user
+        name: Gloves
+        price: 422.25
+        photoUrl: https://avatars.githubusercontent.com/u/81115190
+        stock: 90
+        rating: 8
+        __v: 1
+        desc: Discover the turtle-like agility of our Bike, perfect for juvenile users
+
+    CreateExpenseDto:
+      type: object
+      required: [category, amount]
+      properties:
+        category:
+          type: string
+          enum: [shopping, food, sport, technic, travel]
+          example: food
+        amount:
+          type: number
+          minimum: 1
+          example: 25
+
+    Expense:
+      type: object
+      properties:
+        _id:
+          type: string
+        category:
+          type: string
+        amount:
+          type: number
+        owner:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        __v:
+          type: integer
+      example:
+        _id: 6ab2c1904f2a3b77c1120aa4
+        category: food
+        amount: 25
+        owner: 6aa17703a1daf718c6965010
+        createdAt: '2026-09-09T15:22:10.140Z'
+        updatedAt: '2026-09-09T15:22:10.140Z'
+        __v: 0
+
+  responses:
+    BadRequest:
+      description: Validation failed or business rule rejected the request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
+          example:
+            message: Forbidden resource
+            error: Forbidden
+            statusCode: 403
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
+          example:
+            message: Product not found
+            error: Not Found
+            statusCode: 404
+    TooManyRequests:
+      description: Throttler limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
+          example:
+            message: 'ThrottlerException: Too Many Requests'
+            statusCode: 429

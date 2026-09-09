@@ -4,7 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { loggerMiddleware } from './middlewares/logger.middleware';
 import { SafeGuard } from './guards/safe.guard';
 import { Logger } from 'pino-nestjs';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { setupSwagger } from './swagger/swagger.setup';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {bufferLogs: true});
@@ -23,15 +23,8 @@ async function bootstrap() {
   }))
 
 
-  const config = new DocumentBuilder()
-    .setTitle('Gita Backend 3 course')
-    .setDescription('Random description')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, documentFactory);
+  // OpenAPI spec is hand-written YAML in src/swagger/docs, not decorators.
+  setupSwagger(app);
 
   // app.use(loggerMiddleware)
   // this is global guard

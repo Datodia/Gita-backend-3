@@ -1,0 +1,77 @@
+paths:
+  /auth/sign-up:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      description: Throttled to 3 requests per minute.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpDto'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '400':
+          description: User already exists or payload is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+              example:
+                message: User already exists
+                error: Bad Request
+                statusCode: 400
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /auth/sign-in:
+    post:
+      tags: [Auth]
+      summary: Sign in and receive a JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInDto'
+      responses:
+        '201':
+          description: Access token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Email or password is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+              example:
+                message: Email or password is invalid
+                error: Bad Request
+                statusCode: 400
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /auth/current-user:
+    get:
+      tags: [Auth]
+      summary: Current authenticated user
+      security:
+        - bearer: []
+      responses:
+        '200':
+          description: User document of the bearer token owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'

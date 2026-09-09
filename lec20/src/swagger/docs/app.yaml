@@ -1,0 +1,23 @@
+paths:
+  /:
+    get:
+      tags: [App]
+      summary: Hello world
+      description: Returns a localized greeting. Unknown `lang` values throw a 500.
+      parameters:
+        - name: lang
+          in: query
+          required: false
+          description: Supported locales
+          schema:
+            type: string
+            enum: [en, ka]
+            default: en
+      responses:
+        '200':
+          description: Greeting text
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: hello world

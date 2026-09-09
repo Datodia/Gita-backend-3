@@ -1,0 +1,33 @@
+openapi: 3.0.3
+
+info:
+  title: Gita Backend 3 course
+  description: |
+    REST API for the lec20 NestJS app.
+
+    Documentation is hand-written in `src/swagger/docs/*.yaml` and merged at
+    bootstrap, so controllers stay free of `@Api*` decorators.
+  version: '1.0'
+
+servers:
+  - url: http://localhost:3000
+    description: Local
+
+tags:
+  - name: App
+    description: Health / hello endpoint
+  - name: Auth
+    description: Sign up, sign in, current user
+  - name: Users
+    description: User CRUD
+  - name: Products
+    description: Product CRUD, filtering and S3 uploads
+  - name: Expenses
+    description: Expenses of the authenticated user
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

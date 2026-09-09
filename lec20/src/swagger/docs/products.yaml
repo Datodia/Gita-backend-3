@@ -1,0 +1,223 @@
+paths:
+  /products:
+    post:
+      tags: [Products]
+      summary: Create a product with an image
+      description: Multipart request. The `photo` file is uploaded to S3 and stored as `photoUrl`.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateProductMultipart'
+      responses:
+        '201':
+          description: Created product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    get:
+      tags: [Products]
+      summary: List products with filtering, sorting, pagination and projection
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 1
+            default: 1
+            example: 1
+        - name: take
+          in: query
+          required: false
+          schema:
+            type: number
+            maximum: 30
+            default: 30
+            example: 30
+        - name: priceFrom
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 1
+            example: 100
+        - name: priceTo
+          in: query
+          required: false
+          schema:
+            type: number
+            example: 400
+        - name: name
+          in: query
+          required: false
+          description: Case-insensitive regex match on the product name
+          schema:
+            type: string
+            example: glo
+        - name: isStock
+          in: query
+          required: false
+          description: '1 = in stock only, 0 = out of stock only'
+          schema:
+            type: number
+            enum: [0, 1]
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [price, -price, date, -date]
+        - name: includeName
+          in: query
+          required: false
+          description: '1 = return only the name field, 0 = exclude the name field'
+          schema:
+            type: number
+            enum: [0, 1]
+      responses:
+        '200':
+          description: Matching products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /products/get-file:
+    post:
+      tags: [Products]
+      summary: Get a presigned S3 URL for a stored file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fileId]
+              properties:
+                fileId:
+                  type: string
+                  example: images/3f8c1f5a-2f8a-4a1a-9b2f-6c1e0e1a7b21.png
+      responses:
+        '201':
+          description: Presigned URL
+          content:
+            application/json:
+              schema:
+                type: string
+                example: https://bucket.s3.eu-central-1.amazonaws.com/images/3f8c1f5a.png?X-Amz-Signature=...
+
+  /products/upload-image:
+    post:
+      tags: [Products]
+      summary: Upload a single image to S3
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Stored file id
+          content:
+            application/json:
+              schema:
+                type: string
+                example: images/3f8c1f5a-2f8a-4a1a-9b2f-6c1e0e1a7b21.png
+
+  /products/upload-many:
+    post:
+      tags: [Products]
+      summary: Upload multiple images to S3
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [images]
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Stored file ids
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /products/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ObjectIdParam'
+    get:
+      tags: [Products]
+      summary: Get a product by id
+      responses:
+        '200':
+          description: Product document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Wrong Id provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpError'
+              example:
+                message: Wrong Id provided
+                error: Bad Request
+                statusCode: 400
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Products]
+      summary: Update a product
+      description: Not implemented yet — returns a placeholder string.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductDto'
+      responses:
+        '200':
+          description: Placeholder message
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: This action updates a #1 product
+    delete:
+      tags: [Products]
+      summary: Delete a product and its S3 image
+      responses:
+        '200':
+          description: Deleted product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          $ref: '#/components/responses/NotFound'
