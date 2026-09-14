@@ -18,6 +18,8 @@ import { LoggerModule } from 'pino-nestjs';
 import { ProductsModule } from './products/products.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
+import { EmailSenderModule } from './email-sender/email-sender.module';
+import {MailerModule} from '@nestjs-modules/mailer'
 
 @Module({
   imports: [
@@ -46,12 +48,23 @@ import { AwsS3Module } from './aws-s3/aws-s3.module';
       global: true,
       secret: process.env.JWT_SECRET,
     }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_HOST,
+        port: 465,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      }
+    }),
     MongooseModule.forRoot(process.env.MONGO_URI!),
     ExpensesModule,
     UsersModule,
     AuthModule,
     ProductsModule,
     AwsS3Module,
+    EmailSenderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

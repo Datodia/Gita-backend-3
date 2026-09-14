@@ -43,7 +43,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
           description: resp.data.message,
         });
 
-        router.push('/sign-in')
+        router.push(`/verify-user?email=${encodeURIComponent(data.email)}`)
       }
     } catch (e) {
       let description = "Something went wrong";

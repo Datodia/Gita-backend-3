@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { IsAuthGuard } from 'src/guards/isAuth.guard';
 import { UserId } from 'src/users/decorators/user.decorator';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { VerifyUserDto } from './dto/verify-user.dto';
+import { ResendVerificationCode } from './dto/resend-verification.dto';
 
 
 // https://localhost:3000/auth
@@ -15,7 +17,7 @@ export class AuthController {
 
   @Post('sign-up')
   @UseGuards(ThrottlerGuard)
-  @Throttle({default: {ttl: 60 * 1000, limit: 3}})
+  // @Throttle({default: {ttl: 60 * 1000, limit: 3}})
   signUp(@Body() {age, email, fullName, password}: SignUpDto){
     return this.authService.signUp({email, fullName, password, age})
   }
@@ -24,6 +26,18 @@ export class AuthController {
   @UseGuards(ThrottlerGuard)
   signIn(@Body() {email, password}: SignInDto){
     return this.authService.signIn({email, password})
+  }
+
+  @Post('verify-user')
+  @HttpCode(200)
+  verifyUser(@Body() {OTPCode, email}:VerifyUserDto){
+    return this.authService.verifyUser({OTPCode, email})
+  }
+
+  @Post('resend-verification')
+  @HttpCode(200)
+  resendVerificationCode(@Body() {email}:ResendVerificationCode){
+    return this.authService.resendVerificationCode({email})
   }
 
   @Get('current-user')

@@ -69,6 +69,21 @@ export class User  {
     })
     address!: Address
 
+    @Prop({
+        type: Boolean,
+        default: false
+    })
+    isVerified!: boolean
+
+    @Prop({
+        type: String,
+    })
+    OTPCode?: string
+
+    @Prop({
+        type: Number,
+    })
+    OTPCodeExpirationDate?: number
 }
 
 

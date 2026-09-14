@@ -112,6 +112,10 @@ export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
                  Dont have account?
                   <Link href={"/sign-up"}>Create account</Link>
                 </FieldDescription>
+                <FieldDescription className="px-6 text-center">
+                  Account not verified?{" "}
+                  <Link href={"/verify-user"}>Verify account</Link>
+                </FieldDescription>
               </Field>
             </FieldGroup>
           </FieldGroup>
