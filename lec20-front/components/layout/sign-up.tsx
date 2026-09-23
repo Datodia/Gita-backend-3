@@ -23,6 +23,33 @@ import axios from "axios";
 import { toast } from "../ui/toast";
 import { useRouter } from "next/navigation";
 
+function GoogleIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+    >
+      <path
+        fill="#4285F4"
+        d="M21.6 12.23c0-.7-.06-1.37-.19-2.02H12v3.82h5.39a4.6 4.6 0 0 1-2 3.02v2.5h3.23c1.9-1.75 2.98-4.33 2.98-7.32Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 22c2.7 0 4.96-.9 6.61-2.43l-3.23-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.75-5.59-4.11H.8v2.64A10 10 0 0 0 12 22Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M6.41 19.89A6 6 0 0 1 6 16.8V14.2H2.8A10 10 0 0 0 2 12c0-1.6.38-3.12 1.06-4.45L6.4 10.2A5.98 5.98 0 0 1 6 12c0 .66.12 1.3.34 1.9l.07.99Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 3.98c1.47 0 2.8.5 3.85 1.49l2.88-2.88A9.97 9.97 0 0 0 12 2 10 10 0 0 0 3.86 7.55L7.2 10.2A6 6 0 0 1 12 3.98Z"
+      />
+    </svg>
+  );
+}
+
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const {
     register,
@@ -59,6 +86,10 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       });
     }
   };
+
+  const handleGoogleOAuth = async () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/google`
+  }
 
   return (
     <Card {...props}>
@@ -126,6 +157,15 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             <FieldGroup>
               <Field>
                 <Button type="submit">Create Account</Button>
+                <Button
+                  onClick={handleGoogleOAuth}
+                  type="button"
+                  variant="outline"
+                  className="w-full gap-2 border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
+                >
+                  <GoogleIcon />
+                  <span>Continue with Google</span>
+                </Button>
                 <FieldDescription className="px-6 text-center">
                   Already have an account?{" "}
                   <Link href={"/sign-in"}>Sign in</Link>

@@ -6,6 +6,7 @@ import { userSchema } from 'src/users/schema/user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { EmailSenderModule } from 'src/email-sender/email-sender.module';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { EmailSenderModule } from 'src/email-sender/email-sender.module';
     EmailSenderModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, GoogleStrategy],
 })
 export class AuthModule {}

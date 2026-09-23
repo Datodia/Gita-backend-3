@@ -43,17 +43,17 @@ export class User  {
 
     @Prop({
         type: String,
-        required: true,
+        required: false,
         select: false
     })
-    password!: string
+    password?: string
 
 
     @Prop({
         type: Number,
-        required: true
+        required: false
     })
-    age!: number
+    age?: number
 
 
     @Prop({
@@ -84,6 +84,12 @@ export class User  {
         type: Number,
     })
     OTPCodeExpirationDate?: number
+
+    @Prop({
+        type: String,
+        required: false
+    })
+    profilePic?: string
 }
 
 

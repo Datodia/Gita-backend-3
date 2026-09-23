@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createExpenseSchema, CreateExpenseType } from "@/validations/create-expense.validation";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 type Expense = {
   _id: string;
@@ -34,6 +35,7 @@ type User = {
   email: string;
   createdAt: string;
   expenses: Expense[];
+  profilePic?: string
 };
 
 export default function Home() {
@@ -144,6 +146,7 @@ export default function Home() {
     <div>
       <h1>Hello world</h1>
       <Button onClick={handlelogout}>Log out</Button>
+      {user.profilePic ? <Image src={user.profilePic} alt="avatar" width={100}  height={100}/> : null}
       <h2>{user.email}</h2>
       <h2>{user.fullName}</h2>
 

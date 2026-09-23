@@ -64,6 +64,10 @@ export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
     }
   };
 
+  const handleGoogleOAuth = async () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/google`
+  }
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -108,6 +112,7 @@ export function SignInForm({ ...props }: React.ComponentProps<typeof Card>) {
             <FieldGroup>
               <Field>
                 <Button type="submit">Sign in</Button>
+                <Button onClick={handleGoogleOAuth} type="button">Continue With google</Button>
                 <FieldDescription className="px-6 text-center">
                  Dont have account?
                   <Link href={"/sign-up"}>Create account</Link>

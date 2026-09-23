@@ -69,6 +69,32 @@ export class AuthService {
         return {token}
     }
 
+
+    async continueWithGoogle(user){
+        let existUser = await this.userModel.findOne({email: user.email})
+        if(!existUser){
+            existUser = await this.userModel.create({
+                email: user.email,
+                fullName: user.fullName,
+                profilePic: user.profilePic
+            })
+        }
+
+        existUser.fullName = user.fullName
+        existUser.profilePic = user.profilePic
+        existUser.isVerified = true
+
+
+        existUser.save()
+
+        const payLoad = {
+            userId: existUser._id,
+        }
+        const token = await this.jwtService.sign(payLoad, {expiresIn: '1h'})
+
+        return {token, redirectUri: process.env.FRONTEND_URL}
+    }
+
     async verifyUser({OTPCode, email}: VerifyUserDto){
         const existUser = await this.userModel.findOne({email})
         if(!existUser) throw new BadRequestException('User not found')

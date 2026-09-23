@@ -20,6 +20,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
 import { EmailSenderModule } from './email-sender/email-sender.module';
 import {MailerModule} from '@nestjs-modules/mailer'
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import {MailerModule} from '@nestjs-modules/mailer'
       }
     }),
     MongooseModule.forRoot(process.env.MONGO_URI!),
+    PassportModule.register({defaultStrategy: 'google'}),
     ExpensesModule,
     UsersModule,
     AuthModule,
