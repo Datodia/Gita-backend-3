@@ -1,0 +1,42 @@
+
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    networks:
+      - app-network
+    volumes:
+      - mongo_data:/data/db
+  backend:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    env_file:
+      - ./server/.env
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - app-network
+  frontend:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - 5173:5173
+    networks:
+      - app-network
+volumes:
+  mongo_data:
+
+networks:
+  app-network: 
+    driver: bridge
