@@ -27,10 +27,11 @@ import { PassportModule } from '@nestjs/passport';
     CacheModule.register({isGlobal: true}),
     LoggerModule.forRoot({
       pinoHttp: {
-        transport: {
-          target: 'pino-pretty',
-          options: { singleLine: true },
-        },
+        // pino-pretty is a devDependency and can't be bundled for Vercel
+        transport:
+          process.env.NODE_ENV === 'production' || process.env.VERCEL
+            ? undefined
+            : { target: 'pino-pretty', options: { singleLine: true } },
       },
     }),
     ThrottlerModule.forRoot([{ ttl: 60 * 1000, limit: 20 }]),

@@ -35,10 +35,9 @@ exports.AppModule = AppModule = __decorate([
             cache_manager_1.CacheModule.register({ isGlobal: true }),
             pino_nestjs_1.LoggerModule.forRoot({
                 pinoHttp: {
-                    transport: {
-                        target: 'pino-pretty',
-                        options: { singleLine: true },
-                    },
+                    transport: process.env.NODE_ENV === 'production' || process.env.VERCEL
+                        ? undefined
+                        : { target: 'pino-pretty', options: { singleLine: true } },
                 },
             }),
             throttler_1.ThrottlerModule.forRoot([{ ttl: 60 * 1000, limit: 20 }]),
