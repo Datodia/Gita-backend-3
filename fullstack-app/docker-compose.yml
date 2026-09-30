@@ -1,42 +1,51 @@
-
-
 services:
   mongo:
-    image: mongo
-    restart: always
-    ports:
-      - 27017:27017
-    networks:
-      - app-network
+    image: mongo:8
+    restart: unless-stopped
+    # no public port: only reachable inside app-network
     volumes:
       - mongo_data:/data/db
-  backend:
-    build: 
-      context: ./server
-      dockerfile: Dockerfile
-    depends_on:
-      - mongo
-    env_file:
-      - ./server/.env
-    restart: always
-    ports:
-      - 3000:3000
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGO_URL: ${MONGO_URL:-mongodb://mongo:27017/app}
+    # no public port: nginx (frontend) proxies /api -> backend:3000
+    expose:
+      - 3000
+    networks:
+      - app-network
+
   frontend:
-    build: 
+    build:
       context: ./client
       dockerfile: Dockerfile
-    restart: always
+    restart: unless-stopped
     depends_on:
       - backend
     ports:
-      - 5173:5173
+      - 80:80
     networks:
       - app-network
+
 volumes:
   mongo_data:
 
 networks:
-  app-network: 
+  app-network:
     driver: bridge
