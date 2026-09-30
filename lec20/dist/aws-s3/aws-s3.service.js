@@ -22,7 +22,7 @@ let AwsS3Service = class AwsS3Service {
             region: process.env.AWS_REGION,
             credentials: {
                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-                accessKeyId: process.env.AWS_ACCESS_KEY,
+                accessKeyId: process.env.AWS_MY_ACCESS_KEY,
             }
         });
     }

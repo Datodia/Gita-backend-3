@@ -21,7 +21,7 @@ npm run test:e2e                  # test/*.e2e-spec.ts
 
 ## Environment
 
-`.env` loaded via `ConfigModule` (global), but most modules read `process.env` directly at import/construct time (`JwtModule.register`, `MailerModule.forRoot`, `MongooseModule.forRoot`, `GoogleStrategy`, `AwsS3Service`). Required vars: `MONGO_URI`, `JWT_SECRET`, `FRONTEND_URL`, `PORT`, `AWS_ACCESS_KEY`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_BUCKET_NAME`, `EMAIL_HOST`, `EMAIL_USER`, `EMAIL_PASS`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`. `.env.example` is incomplete (missing email + Google vars).
+`.env` loaded via `ConfigModule` (global), but most modules read `process.env` directly at import/construct time (`JwtModule.register`, `MailerModule.forRoot`, `MongooseModule.forRoot`, `GoogleStrategy`, `AwsS3Service`). Required vars: `MONGO_URI`, `JWT_SECRET`, `FRONTEND_URL`, `PORT`, `AWS_MY_ACCESS_KEY`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_BUCKET_NAME`, `EMAIL_HOST`, `EMAIL_USER`, `EMAIL_PASS`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`. `.env.example` is incomplete (missing email + Google vars).
 
 ## Architecture
 
