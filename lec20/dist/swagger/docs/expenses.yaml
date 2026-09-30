@@ -1,0 +1,82 @@
+paths:
+  /expenses:
+    get:
+      tags: [Expenses]
+      summary: List the expenses of the authenticated user
+      security:
+        - bearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 1
+            default: 1
+            example: 1
+        - name: take
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 1
+            maximum: 30
+            default: 30
+            example: 30
+      responses:
+        '200':
+          description: Expenses page
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Expenses]
+      summary: Create an expense for the authenticated user
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseDto'
+      responses:
+        '201':
+          description: Created expense
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /expenses/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ObjectIdParam'
+    get:
+      tags: [Expenses]
+      summary: Get an expense by id
+      security:
+        - bearer: []
+      responses:
+        '200':
+          description: Expense document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
